@@ -1,3 +1,5 @@
+/*
+
 package main
 
 import (
@@ -12,12 +14,15 @@ func main() {
 
 // Write your code here
 
-func getDiagSouthEast(sqAr []int) []int {
+// get values of 1st diag
+func getDiagSouthEast(sqAr [][]int) []int {
 	ar := sqAr
-	return ar
-}
-    // get values of 1st diag
-        // iterate over each row, max size =n
+
+		// iterate over each row, max size =n
+		for row, elem := range ar {
+			for col, elem: range 
+
+		}
         // grab elem at these indices 
             // row0: col0
             // row1: col1
@@ -33,4 +38,9 @@ func getDiagSouthEast(sqAr []int) []int {
             // row2: coln-2
             // rown: coln-n
     // get sums for each diag
-    // get absolute value of difference
+	// get absolute value of difference
+	
+	return ar
+}	
+
+*/
