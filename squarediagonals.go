@@ -1,31 +1,21 @@
-//package github.com/deodelacruz
-
 package main
 
 import (
-  "fmt" 
-  //"reflect"
-  //"strconv"
+	"fmt"
 )
 
 func main() {
-  //var b bool = true
-  var s string = "1"
-  //var i int = 4
-  //var f float64 = 2.3
-
-  //fmt.Println(s, strconv.ParseInt(s))
+	//do something
+	ar:= []int{1,2,3}
+	fmt.Println(getDiagSouthEast(ar))
 }
 
-func sayHello(friend string) string {
-   return ("Hello " + friend)
-}
+// Write your code here
 
-func sum(a,b int) int {
-  return a+b
+func getDiagSouthEast(sqAr []int) []int {
+	ar := sqAr
+	return ar
 }
-
-    // Write your code here
     // get values of 1st diag
         // iterate over each row, max size =n
         // grab elem at these indices 
