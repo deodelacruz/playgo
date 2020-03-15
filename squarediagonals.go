@@ -1,5 +1,3 @@
-/*
-
 package main
 
 import (
@@ -8,28 +6,28 @@ import (
 
 func main() {
 	//do something
-	ar:= []int{1,2,3}
+	ar := []int{1, 2, 3}
 	fmt.Println(getDiagSouthEast(ar))
 }
 
 // Write your code here
 
-// get values of 1st diag
+/* get values of 1st diag
 func getDiagSouthEast(sqAr [][]int) []int {
 	ar := sqAr
 
 		// iterate over each row, max size =n
 		for row, elem := range ar {
-			for col, elem: range 
+			for col, elem: range
 
 		}
-        // grab elem at these indices 
+        // grab elem at these indices
             // row0: col0
             // row1: col1
             // row2: col2
-            // rown: coln 
-          // var diag1 = [n]int32 
-            
+            // rown: coln
+          // var diag1 = [n]int32
+
     // collect values of 2nd diag
         //iterate over each row
         // grab elem at these indices
@@ -39,8 +37,6 @@ func getDiagSouthEast(sqAr [][]int) []int {
             // rown: coln-n
     // get sums for each diag
 	// get absolute value of difference
-	
-	return ar
-}	
 
+	return ar
 */
