@@ -1,17 +1,17 @@
-/**
 package main
 
 import (
 	"fmt"
-	"math/rand"
-	"strings"
-	"time"
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	r := rand.Intn(5) + 1
-	stars := strings.Repeat("*", r)
-	fmt.Println(stars)
+	fmt.Print("Enter First Floating Point: ")
+	var first float64
+	fmt.Scanln(&first)
+	fmt.Println(int64(first))
+
+	fmt.Print("Enter Second Floating Point: ")
+	var second float64
+	fmt.Scanln(&second)
+	fmt.Println(int64(second))
 }
-**/
