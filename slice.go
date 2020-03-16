@@ -9,27 +9,23 @@ import (
 
 func main() {
 	sli := make([]int, 3)
-
 	for {
-
 		fmt.Println("Please enter an integer to add to the slice. Press 'X' to exit.")
-
 		var userInput string
 		if _, err := fmt.Scanln(&userInput); err != nil {
 			os.Exit(1)
 		} else {
-
 			if userInput == "X" {
 				break
 			}
 
+			// if input cannot be parsed successfully to int, just ignore, don't add to slice of integers
 			parsedInt, _ := strconv.ParseInt(userInput, 0, 64)
 			sli = append(sli, int(parsedInt))
 			sort.Ints(sli)
 			fmt.Printf("Sorted slice: %v\n", sli)
 		}
 	}
-
 	return
 }
 
