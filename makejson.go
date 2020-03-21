@@ -6,6 +6,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 )
@@ -28,6 +29,9 @@ func main() {
 	map1["address"] = address
 
 	fmt.Printf("Map Person: %v\n", map1)
+
+	json1, _ := json.Marshal(map1)
+	fmt.Printf("Json Person: %v\n", string(json1))
 
 	person1 := person{name, address}
 	fmt.Printf("Struct Person: %v\n", person1)
