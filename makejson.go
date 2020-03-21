@@ -33,6 +33,6 @@ func main() {
 	//fmt.Printf("Map Person: %v\n", map1)
 
 	json1, _ := json.Marshal(map1)
-	fmt.Printf("Json Person: %v\n", string(json1))
+	fmt.Printf("Json: %v\n", string(json1))
 
 }
