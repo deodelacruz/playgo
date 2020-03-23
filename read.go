@@ -19,29 +19,28 @@ import (
 
 func main() {
 
-	stdInReader := bufio.NewReader(os.Stdin)
 	fmt.Println("Hi. What is the name of the text file?")
+	currentPath, _ := os.Getwd()
+	stdInReader := bufio.NewReader(os.Stdin)
 	fileName, _ := stdInReader.ReadString('\n')
-	fmt.Printf("Name: %v\n", fileName)
+	filePath := strings.TrimSuffix(currentPath+string(os.PathSeparator)+fileName, "\n")
+	fmt.Printf("file: %v\n", filePath)
 
-	sliceNames := make([]name)
-	file, err := os.Open(fileName)
+	sliceNames := make([]name, 0)
+	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
 	}
-
 	fileReader := bufio.NewReader(file)
 	for {
 		line, _, err := fileReader.ReadLine()
-
 		if err == io.EOF {
 			break
 		}
-
-		fmt.Printf("%s \n", line)
-		fields := strings.Fields(line)
+		//fmt.Printf("%s \n", line)
+		fields := strings.Fields(string(line))
 		nameStruct := name{fields[0], fields[1]}
-		sliceNames := append(sliceNames, nameStruct)
+		sliceNames = append(sliceNames, nameStruct)
 	}
 
 	for _, fullName := range sliceNames {
