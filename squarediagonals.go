@@ -1,13 +1,9 @@
 package main
 
-import (
-	"fmt"
-)
-
 func main() {
 	//do something
-	ar := []int{1, 2, 3}
-	fmt.Println(getDiagSouthEast(ar))
+	//ar := []int{1, 2, 3}
+	//fmt.Println(getDiagSouthEast(ar))
 }
 
 // Write your code here
