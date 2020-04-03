@@ -62,8 +62,6 @@ func BubbleSort(intSlice []int) {
 		}
 		j++
 	}
-	//fmt.Printf("sorted slice: %v %s", intSlice, "\n")
-	//return
 }
 
 // Swap - swaps two adjacent slice elements starting at index i
