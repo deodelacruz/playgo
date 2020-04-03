@@ -19,17 +19,20 @@ import (
 	"strings"
 )
 
+var intSlice []int
+
 func main() {
 	// request up to 10 integers from the user
-	getUserInput()
-	/* fmt.Println("Sorting your input via bubble sort algorithm.")
-	slice1 := []int{1, 2, 3}
-	fmt.Printf("unsorted slice: %v", slice1)
-	bubbleSort(&slice1) */
+	intSlice = getUserInput()
+	fmt.Println("Sorting your integer set via bubble sort algorithm.")
+
+	fmt.Printf("unsorted slice: %v %s", intSlice, "\n")
+	bubbleSort()
+	fmt.Printf("sorted slice: %v %s", intSlice, "\n")
 }
 
 func getUserInput() []int {
-	fmt.Println("Hi. Please type in up to 10 integers (press Enter after each int, and . to end input).")
+	fmt.Println("Hi. Please type in up to 10 integers (press Enter after each integer and . to end input).")
 	reader := bufio.NewReader(os.Stdin)
 	inputSlice := []int{}
 	for i := 0; i < 10; i++ {
@@ -44,16 +47,33 @@ func getUserInput() []int {
 			break
 		}
 	}
-	fmt.Printf("input: %v", inputSlice)
+	fmt.Printf("input: %v %s", inputSlice, "\n")
 	return inputSlice
 }
 
-/*
-func bubbleSort(intSlice *[]int) {
-	fmt.Printf("sorted slice: %v", intSlice)
-	return
+func bubbleSort() {
+	j := 0
+	for {
+		swapOccurred := false
+		for i := 0; i < (len(intSlice) - 1); i++ {
+			if intSlice[i] > intSlice[i+1] { //swap
+				tmpElem := intSlice[i]
+				intSlice[i] = intSlice[i+1]
+				intSlice[i+1] = tmpElem
+				swapOccurred = true
+			}
+		} // single pass
+		fmt.Printf("pass %v: %v %s", j, intSlice, "\n")
+		if swapOccurred == false {
+			break
+		}
+		j++
+	}
+	//fmt.Printf("sorted slice: %v %s", intSlice, "\n")
+	//return
 }
 
+/*
 func swap() {
 
 } */
