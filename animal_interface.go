@@ -44,18 +44,18 @@ type Cow struct {
 }
 
 // Eat function
-func (myAnimal *Cow) Eat() {
-	return myAnimal.food
+func (myAnimal Cow) Eat() {
+	fmt.Println(myAnimal.food)
 }
 
 // Move function
-func (myAnimal *Cow) Move() {
-	return myAnimal.locomotion
+func (myAnimal Cow) Move() {
+	fmt.Println(myAnimal.locomotion)
 }
 
 // Speak function
-func (myAnimal *Cow) Speak() {
-	return myAnimal.noise
+func (myAnimal Cow) Speak() {
+	fmt.Println(myAnimal.noise)
 }
 
 // Bird struct
@@ -66,18 +66,18 @@ type Bird struct {
 }
 
 // Eat function
-func (myAnimal *Bird) Eat() {
-	return myAnimal.food
+func (myAnimal Bird) Eat() {
+	fmt.Println(myAnimal.food)
 }
 
 // Move function
-func (myAnimal *Bird) Move() {
-	return myAnimal.locomotion
+func (myAnimal Bird) Move() {
+	fmt.Println(myAnimal.locomotion)
 }
 
 // Speak function
-func (myAnimal *Bird) Speak() {
-	return myAnimal.noise
+func (myAnimal Bird) Speak() {
+	fmt.Println(myAnimal.noise)
 }
 
 // Snake struct
@@ -88,18 +88,18 @@ type Snake struct {
 }
 
 // Eat function
-func (myAnimal Snake) Eat() string {
-	return myAnimal.food
+func (myAnimal Snake) Eat() {
+	fmt.Println(myAnimal.food)
 }
 
 // Move function
-func (myAnimal Snake) Move() string {
-	return myAnimal.locomotion
+func (myAnimal Snake) Move() {
+	fmt.Println(myAnimal.locomotion)
 }
 
 // Speak function
-func (myAnimal Snake) Speak() string {
-	return myAnimal.noise
+func (myAnimal Snake) Speak() {
+	fmt.Println(myAnimal.noise)
 }
 
 func processInput() {
@@ -121,11 +121,14 @@ func processInput() {
 				var myAnimal Animal
 				switch animalType {
 				case "cow":
-					myAnimal = Cow{"grass", "walk", "moo"}
+					cow := Cow{"grass", "walk", "moo"}
+					myAnimal = cow
 				case "bird":
-					myAnimal = Bird{"worms", "fly", "peep"}
+					bird := Bird{"worms", "fly", "peep"}
+					myAnimal = bird
 				case "snake":
-					myAnimal = Snake{"mice", "slither", "hiss"}
+					snake := Snake{"mice", "slither", "hiss"}
+					myAnimal = snake
 				default:
 					{
 						fmt.Println("Oops. You have to specify either cow, bird or snake.")
@@ -133,11 +136,11 @@ func processInput() {
 				}
 				switch animalAction {
 				case "eat":
-					fmt.Printf("This animal eats: %s \n", myAnimal.Eat())
+					myAnimal.Eat()
 				case "move":
-					fmt.Printf("This animal's movement: %s \n", myAnimal.Move())
+					myAnimal.Move()
 				case "speak":
-					fmt.Printf("This animal speaks: %s \n", myAnimal.Speak())
+					myAnimal.Speak()
 				default:
 					{
 						fmt.Println("Oops. You have to specify either eat, move or speak.")
@@ -150,19 +153,4 @@ func processInput() {
 			// handle error.
 		}
 	}
-}
-
-// Eat function
-func (myAnimal Animal) Eat() string {
-	return myAnimal.food
-}
-
-// Move function
-func (myAnimal Animal) Move() string {
-	return myAnimal.locomotion
-}
-
-// Speak function
-func (myAnimal Animal) Speak() string {
-	return myAnimal.noise
 }
