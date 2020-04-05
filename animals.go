@@ -31,13 +31,16 @@ func readInput() {
 	fmt.Println("Hi. Please type in a request in this format: animal action")
 	fmt.Println("Note: animal can be either cow, bird or snake")
 	fmt.Println("Note: action can be either eat, move or speak")
-	fmt.Print("> ")
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-	}
-	if scanner.Err() != nil {
-		// handle error.
+	for {
+		fmt.Print("> ")
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			fmt.Println(scanner.Text())
+			break
+		}
+		if scanner.Err() != nil {
+			// handle error.
+		}
 	}
 }
 
