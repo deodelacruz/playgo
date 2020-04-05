@@ -38,6 +38,7 @@ type Animal interface {
 
 // Cow struct
 type Cow struct {
+	name       string
 	food       string
 	locomotion string
 	noise      string
@@ -60,6 +61,7 @@ func (myAnimal Cow) Speak() {
 
 // Bird struct
 type Bird struct {
+	name       string
 	food       string
 	locomotion string
 	noise      string
@@ -82,6 +84,7 @@ func (myAnimal Bird) Speak() {
 
 // Snake struct
 type Snake struct {
+	name       string
 	food       string
 	locomotion string
 	noise      string
@@ -103,50 +106,80 @@ func (myAnimal Snake) Speak() {
 }
 
 func processInput() {
-	fmt.Println("Hi. Please type in a request in this format: animal action")
-	fmt.Println("Note: animal can be either cow, bird or snake")
-	fmt.Println("Note: action can be either eat, move or speak")
+	fmt.Println("Hi. Please type in a cmd in either of the formats below: ")
+	fmt.Println("a) newanimal animalname animaltype (where animaltype is either cow, bird or snake)")
+	fmt.Println("b) quey animalname action (where action is either eat,move or speak)")
+
+	mapAnimals := make(map[string]Animal)
 	for {
 		fmt.Print("> ")
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			animalInput := strings.Fields(scanner.Text())
-			fmt.Printf("%v %v \n", animalInput, len(animalInput))
-			if len(animalInput) != 2 {
-				fmt.Println("Oops. You have to specify exactly 2 strings.")
+			//fmt.Printf("User Input: %v %v \n", animalInput, len(animalInput))
+			if len(animalInput) != 3 {
+				fmt.Println("Oops. You have to specify exactly 3 strings.")
 			} else {
-				animalType := animalInput[0]
-				animalAction := animalInput[1]
-				// instantiate new animal based on input
 				var myAnimal Animal
-				switch animalType {
-				case "cow":
-					cow := Cow{"grass", "walk", "moo"}
-					myAnimal = cow
-				case "bird":
-					bird := Bird{"worms", "fly", "peep"}
-					myAnimal = bird
-				case "snake":
-					snake := Snake{"mice", "slither", "hiss"}
-					myAnimal = snake
+				cmd := animalInput[0]
+				animalName := animalInput[1]
+				arg3 := animalInput[2]
+				switch cmd {
+				case "newanimal":
+					{
+						// instantiate new animal based on input
+						isNewAnimalCreated := false
+						animalType := arg3
+						switch animalType {
+						case "cow":
+							cow := Cow{animalName, "grass", "walk", "moo"}
+							myAnimal = cow
+							isNewAnimalCreated = true
+						case "bird":
+							bird := Bird{animalName, "worms", "fly", "peep"}
+							myAnimal = bird
+							isNewAnimalCreated = true
+						case "snake":
+							snake := Snake{animalName, "mice", "slither", "hiss"}
+							myAnimal = snake
+							isNewAnimalCreated = true
+						default:
+							{
+								fmt.Println("Oops. You have to specify either cow, bird or snake.")
+								isNewAnimalCreated = false
+							}
+
+						} // switch animalType
+						if isNewAnimalCreated {
+							mapAnimals[animalName] = myAnimal // add new animal to map wih name as key
+							fmt.Println("Created it!")
+						}
+						fmt.Printf("mapAnimals: %v \n", mapAnimals)
+					} //case: newanimal
+				case "query":
+					{
+						// get object for given name - implement this via map
+						myAnimal = mapAnimals[animalName]
+						animalAction := arg3
+						switch animalAction {
+						case "eat":
+							myAnimal.Eat()
+						case "move":
+							myAnimal.Move()
+						case "speak":
+							myAnimal.Speak()
+						default:
+							{
+								fmt.Println("Oops. You have to specify either eat, move or speak.")
+							}
+						} //switch animalAction
+					} //case query
 				default:
 					{
-						fmt.Println("Oops. You have to specify either cow, bird or snake.")
+						fmt.Println("Oops. Your 1st argument should be either newanimal or query.")
 					}
-				}
-				switch animalAction {
-				case "eat":
-					myAnimal.Eat()
-				case "move":
-					myAnimal.Move()
-				case "speak":
-					myAnimal.Speak()
-				default:
-					{
-						fmt.Println("Oops. You have to specify either eat, move or speak.")
-					}
-				}
-			}
+				} // switch  cmd
+			} //else
 			break
 		}
 		if scanner.Err() != nil {
