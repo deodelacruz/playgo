@@ -16,7 +16,7 @@ Define an interface type called Animal which describes the methods of an animal.
 Submit your Go program source code.
 */
 
-package main
+package playgo
 
 import (
 	"bufio"

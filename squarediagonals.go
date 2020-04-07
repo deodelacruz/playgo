@@ -1,4 +1,4 @@
-package main
+package playgo
 
 func main() {
 	//do something

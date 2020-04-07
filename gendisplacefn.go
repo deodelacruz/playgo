@@ -15,7 +15,7 @@ fmt.Println(fn(3))
 And I can use the following statement to print the displacement after 5 seconds.
 fmt.Println(fn(5)) */
 
-package main
+package playgo
 
 import (
 	"bufio"

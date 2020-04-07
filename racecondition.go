@@ -7,7 +7,7 @@ In general, the order of execution and completion of concurrent/interleaved task
 
 */
 
-package main
+package playgo
 
 import (
 	"fmt"
