@@ -45,4 +45,14 @@ func getUserInput() {
 		os.Exit(1)
 	}
 	fmt.Printf("inputSlice: %v\n", inputSlice)
+	fmt.Printf("inputSlicePtr: %v\n", &inputSlice)
+	processInputSlice(inputSlice)
+}
+
+func processInputSlice(inputSlice []int) {
+	fmt.Printf("inputSlicePtr: %v\n", &inputSlice)
+	fmt.Printf("inputSlice: %v\n", inputSlice)
+	fmt.Printf("inputSlice: %v\n", inputSlice)
+	// divide slice into 4 equal parts
+
 }
