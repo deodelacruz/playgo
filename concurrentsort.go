@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 func main() {
@@ -73,11 +74,15 @@ func processInputSlice(inputSlice []int) {
 	}
 	fmt.Printf("4 unsorted slices: %v %v %v %v\n", slice1, slice2, slice3, slice4)
 
-	// sort each of 4 slices
-	go sort.Ints(slice1)
-	go sort.Ints(slice2)
-	go sort.Ints(slice3)
-	go sort.Ints(slice4)
+	// spawn multiple threads to sort each of 4 slices
+	var wg sync.WaitGroup
+
+	wg.Add(4)
+	go sortSlice(slice1, &wg)
+	go sortSlice(slice2, &wg)
+	go sortSlice(slice3, &wg)
+	go sortSlice(slice4, &wg)
+	wg.Wait()
 	fmt.Printf("4 sorted slices: %v %v %v %v\n", slice1, slice2, slice3, slice4)
 
 	//merge all 4, then sort
@@ -94,4 +99,11 @@ func processInputSlice(inputSlice []int) {
 	fmt.Printf("All 4 merged unsorted slice: %v\n", mainSlice)
 	sort.Ints(mainSlice)
 	fmt.Printf("All 4 merged sorted slice: %v\n", mainSlice)
+}
+
+func sortSlice(tmpSlice []int, countPtr *sync.WaitGroup) []int {
+	sort.Ints(tmpSlice)
+	fmt.Printf("sorted slice: %v\n", tmpSlice)
+	countPtr.Done()
+	return tmpSlice
 }
