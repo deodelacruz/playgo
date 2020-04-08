@@ -11,6 +11,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -20,11 +22,19 @@ func main() {
 
 func getUserInput() {
 	fmt.Println("Please type in a series of integers and I will perform concurrent sorting on those. Type . to end user input.")
+	inputSlice := []int{}
 	inputScanner := bufio.NewScanner(os.Stdin)
-	tmp := ""
 	for inputScanner.Scan() {
-		tmp = inputScanner.Text()
-		fmt.Printf("Input: %v\n", tmp)
+		myInt, err := strconv.Atoi(strings.TrimSpace(inputScanner.Text()))
+		if err != nil {
+			fmt.Println("Oops. Please type in an integer.")
+			//fmt.Printf("Err: %v\n", err)
+		} else {
+			fmt.Printf("Input: %i\n", myInt)
+			// append to slice
+			inputSlice = append(inputSlice, myInt)
+			fmt.Printf("inputSlice: %v\n", inputSlice)
+		}
 	}
 	if inputScanner.Err() != nil {
 		fmt.Println(inputScanner.Err())
