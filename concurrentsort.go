@@ -25,7 +25,11 @@ func getUserInput() {
 	inputSlice := []int{}
 	inputScanner := bufio.NewScanner(os.Stdin)
 	for inputScanner.Scan() {
-		myInt, err := strconv.Atoi(strings.TrimSpace(inputScanner.Text()))
+		inputString := strings.TrimSpace(inputScanner.Text())
+		if inputString == "." {
+			break
+		}
+		myInt, err := strconv.Atoi(inputString)
 		if err != nil {
 			fmt.Println("Oops. Please type in an integer.")
 			//fmt.Printf("Err: %v\n", err)
@@ -40,5 +44,5 @@ func getUserInput() {
 		fmt.Println(inputScanner.Err())
 		os.Exit(1)
 	}
-
+	fmt.Printf("inputSlice: %v\n", inputSlice)
 }
