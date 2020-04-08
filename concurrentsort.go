@@ -34,7 +34,6 @@ func getUserInput() {
 			fmt.Println("Oops. Please type in an integer.")
 			//fmt.Printf("Err: %v\n", err)
 		} else {
-			fmt.Printf("Input: %i\n", myInt)
 			// append to slice
 			inputSlice = append(inputSlice, myInt)
 			fmt.Printf("inputSlice: %v\n", inputSlice)
@@ -52,7 +51,28 @@ func getUserInput() {
 func processInputSlice(inputSlice []int) {
 	fmt.Printf("inputSlicePtr: %v\n", &inputSlice)
 	fmt.Printf("inputSlice: %v\n", inputSlice)
-	fmt.Printf("inputSlice: %v\n", inputSlice)
+	fmt.Printf("inputSliceLength: %v\n", len(inputSlice))
 	// divide slice into 4 equal parts
-
+	slice1 := []int{}
+	slice2 := []int{}
+	slice3 := []int{}
+	slice4 := []int{}
+	for i, elem := range inputSlice {
+		remainder := i % 4 // modulo or remainder
+		fmt.Printf("remainder of div 4: %v\n", remainder)
+		fmt.Printf("elem: %v\n", elem)
+		if remainder == 0 {
+			slice1 = append(slice1, elem)
+		}
+		if remainder == 1 {
+			slice2 = append(slice2, elem)
+		}
+		if remainder == 2 {
+			slice3 = append(slice3, elem)
+		}
+		if remainder == 3 {
+			slice4 = append(slice4, elem)
+		}
+	}
+	fmt.Printf("slices: %v %v %v %v\n", slice1, slice2, slice3, slice4)
 }
