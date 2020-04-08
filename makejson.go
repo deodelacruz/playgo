@@ -6,7 +6,7 @@ Marshal() to create a JSON object from the map, and then your program should
 print the JSON object.
 */
 
-package main
+package playgo
 
 import (
 	"bufio"

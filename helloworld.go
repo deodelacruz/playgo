@@ -1,6 +1,6 @@
 //package github.com/deodelacruz
 
-package main
+package playgo
 
 //"reflect"
 //"strconv"
