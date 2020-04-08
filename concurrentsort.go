@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -43,15 +44,11 @@ func getUserInput() {
 		fmt.Println(inputScanner.Err())
 		os.Exit(1)
 	}
-	fmt.Printf("inputSlice: %v\n", inputSlice)
-	fmt.Printf("inputSlicePtr: %v\n", &inputSlice)
 	processInputSlice(inputSlice)
 }
 
 func processInputSlice(inputSlice []int) {
-	fmt.Printf("inputSlicePtr: %v\n", &inputSlice)
-	fmt.Printf("inputSlice: %v\n", inputSlice)
-	fmt.Printf("inputSliceLength: %v\n", len(inputSlice))
+	//fmt.Printf("inputSliceLength: %v\n", len(inputSlice))
 	// divide slice into 4 equal parts
 	slice1 := []int{}
 	slice2 := []int{}
@@ -59,8 +56,8 @@ func processInputSlice(inputSlice []int) {
 	slice4 := []int{}
 	for i, elem := range inputSlice {
 		remainder := i % 4 // modulo or remainder
-		fmt.Printf("remainder of div 4: %v\n", remainder)
-		fmt.Printf("elem: %v\n", elem)
+		//fmt.Printf("remainder of div 4: %v\n", remainder)
+		//fmt.Printf("elem: %v\n", elem)
 		if remainder == 0 {
 			slice1 = append(slice1, elem)
 		}
@@ -74,5 +71,27 @@ func processInputSlice(inputSlice []int) {
 			slice4 = append(slice4, elem)
 		}
 	}
-	fmt.Printf("slices: %v %v %v %v\n", slice1, slice2, slice3, slice4)
+	fmt.Printf("4 unsorted slices: %v %v %v %v\n", slice1, slice2, slice3, slice4)
+
+	// sort each of 4 slices
+	go sort.Ints(slice1)
+	go sort.Ints(slice2)
+	go sort.Ints(slice3)
+	go sort.Ints(slice4)
+	fmt.Printf("4 sorted slices: %v %v %v %v\n", slice1, slice2, slice3, slice4)
+
+	//merge all 4, then sort
+	mainSlice := slice1
+	for _, elem := range slice2 {
+		mainSlice = append(mainSlice, elem)
+	}
+	for _, elem := range slice3 {
+		mainSlice = append(mainSlice, elem)
+	}
+	for _, elem := range slice4 {
+		mainSlice = append(mainSlice, elem)
+	}
+	fmt.Printf("All 4 merged unsorted slice: %v\n", mainSlice)
+	sort.Ints(mainSlice)
+	fmt.Printf("All 4 merged sorted slice: %v\n", mainSlice)
 }
