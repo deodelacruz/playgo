@@ -1,0 +1,44 @@
+Sync.Mutex (mutual exclusion, only one at a time gets access)
+
+Lock() - sets shared variable in use for 1st thread, other threads will block
+Unlock() - once thread is done with shared data, put flag down for others to get shared var access
+
+var mut Sync.Mutex
+
+func goThread() {
+mut.Lock()
+doSomething
+mut.Unlock
+}
+
+/*
+
+Define Moore’s law and explain why it has now stopped being true. Be sure to describe all of the physical limitations that have prevented Moore’s law from continuing to be true.
+-------------
+
+https://www.coursera.org/learn/golang-getting-started/peer/01wGe/module-2-activity-trunc-go
+
+
+Write a program which prompts the user to enter a floating point number and prints the integer which is a truncated version of the floating point number that was entered. Truncation is the process of removing the digits to the right of the decimal place.
+
+
+func trunc(floater float64) int {
+     return int(floater)
+}
+
+// ways to read input from stdin
+
+reader:= bufio.NewReader(os.Stding)
+input,_ := reader.readString('n')
+
+----
+scanner := bufio.NewScanner(os.Stdin)
+for scanner.Scan() {
+    fmt.Println(scanner.Text())
+}
+
+if scanner.Err() != nil {
+    // handle error.
+}
+
+*/
