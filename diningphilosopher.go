@@ -21,8 +21,9 @@ import (
 
 var requestForTicketChnl chan int
 var grantATicketChnl chan *mealGrant
+var receiveMealTicketBackChnl chan int
 var mealTickets []*mealTicket
-var isMealTix1Avail, isMealTix2Avail bool
+var isMealTix0Avail, isMealTix1Avail bool
 
 func main() {
 
@@ -46,11 +47,12 @@ func main() {
 	}
 	fmt.Printf("Meal tickets instantiated: %v\n", mealTickets)
 
+	isMealTix0Avail = true
 	isMealTix1Avail = true
-	isMealTix2Avail = true
 
-	requestForTicketChnl = make(chan int)    // philo sends their id to host
-	grantATicketChnl = make(chan *mealGrant) // host provides mealticket here
+	requestForTicketChnl = make(chan int)      // philo sends their id to host to request meal ticket
+	grantATicketChnl = make(chan *mealGrant)   // host provides mealticket here
+	receiveMealTicketBackChnl = make(chan int) // philo sends back meal ticket here when done eating
 
 	go hostProcessMealTickets()
 
@@ -58,7 +60,7 @@ func main() {
 		go philos[i].eat()
 	}
 
-	time.Sleep(2 * time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	fmt.Println("Done with func main().")
 }
 
@@ -80,25 +82,31 @@ func hostGrantsMealTicket() {
 	fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
 	// try to grant 1 meal ticket if any avail to requestor
 	for _, mealTicket := range mealTickets {
-		if isMealTix1Avail { // if mealTix1 is available, lease it out
+		if isMealTix0Avail { // if mealTix1 is available, lease it out
 			mg := &mealGrant{requestingPhiloId, mealTicket.id}
+			fmt.Printf("Host: Leasing out meal ticket 0 to philosopher %v.\n", requestingPhiloId)
 			grantATicketChnl <- mg
-			fmt.Printf("Host: Leased out meal ticket 0 to philosopher %v.\n", requestingPhiloId)
+			isMealTix0Avail = false
+			break
+		} else if isMealTix1Avail { // else if mealTix2 is availalbe, lease it
+			mg := &mealGrant{requestingPhiloId, mealTicket.id}
+			fmt.Printf("Host: Leasing out meal ticket 1 to philosopher %v.\n", requestingPhiloId)
+			grantATicketChnl <- mg
 			isMealTix1Avail = false
-		} else if isMealTix2Avail { // else if mealTix2 is availalbe, lease it
-			mg := &mealGrant{requestingPhiloId, mealTicket.id}
-			grantATicketChnl <- mg
-			fmt.Printf("Host: Leased out meal ticket 1 to philosopher %v\n.", requestingPhiloId)
-			isMealTix2Avail = false
+			break
 		}
 	}
 }
 
-/*
-func hostGetsBackMealTicket(mealTix *sync.Mutext)  {
-  // set mealTix to avail
-  mealTix.Lock()
-} */
+func hostGetsBackMealTicket() {
+	mealTixid := <-receiveMealTicketBackChnl
+	// set mealTix to avail
+	if mealTixid == 0 {
+		isMealTix0Avail = true
+	} else if mealTixid == 1 {
+		isMealTix1Avail = true
+	}
+}
 
 // create 5 chopstick mutex
 type ChopS struct {
@@ -140,6 +148,8 @@ func (p Philo) eat() {
 			   p.rightCS.Unlock()
 			   p.leftCS.Unlock()
 			    p.mealTix.Lock() */
+			fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
+			receiveMealTicketBackChnl <- myMealGrant.mealTicketId
 		} else {
 			fmt.Printf("Philosopher%v: Meal ticket %v is not meant for me.\n", p.id, myMealGrant.mealTicketId)
 		}
