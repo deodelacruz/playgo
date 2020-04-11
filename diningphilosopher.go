@@ -16,7 +16,6 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
 var requestForTicketChnl chan int
@@ -26,6 +25,7 @@ var mealTickets []*mealTicket
 var numPhilosFull int
 var wg sync.WaitGroup
 var maxPhilos int
+var mx sync.Mutex
 
 func main() {
 
@@ -189,7 +189,7 @@ func (p Philo) eat() {
 				   p.rightCS.Unlock()
 				   p.leftCS.Unlock()
 				    p.mealTix.Lock() */
-				time.Sleep(1 * time.Microsecond)
+				//time.Sleep(1 * time.Microsecond)
 				numTimesEat++
 				fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
 				// Note: line below causes deadlock
@@ -203,7 +203,9 @@ func (p Philo) eat() {
 		}
 		//	time.Sleep(1 * time.Microsecond) // sleep before requesting new ticket
 	} //for
+	mx.Lock()
 	numPhilosFull++
+	mx.Unlock()
 	fmt.Printf("Philosopher%v: sees numPhilosFull:%v\n", p.id, numPhilosFull)
 	wg.Done()
 }
