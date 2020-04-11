@@ -18,6 +18,9 @@ import (
 	"sync"
 )
 
+var requestForTicketChnl chan int
+var grantATicketChnl chan mealGrant
+
 func main() {
 
 	// create 5 chopstick mutex
@@ -53,17 +56,6 @@ func main() {
 	*/
 }
 
-// create 2 mealticket mutex
-type mealTicket struct {
-	id  int
-	mtx sync.Mutex
-}
-
-type mealGrant struct {
-	philoId      int
-	mealTicketId int
-}
-
 // investigate use of channel between host/server and clients/philos
 func hostProcessMealTickets() {
 	hostGrantsMealTicket()
@@ -75,10 +67,9 @@ func hostProcessMealTickets() {
 // host lets only 2 philos eat at a time
 func hostGrantsMealTicket() {
 	// monitor channel of requests for meal ticket from philo
-	var philoId int
-	philoId <- requestForTicketChnl
-	requestingPhiloId := requestForTicketChnl
-	fmt.Println("Host: Received meal request from philosopher." + philoId)
+	var requestingPhiloId int
+	requestingPhiloId = <-requestForTicketChnl
+	fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
 	/* try to grant ticket if avail to requestor
 	for _,mealTicket := range mealTickets {
 	  if isMealTix1Avail {   // if mealTix1 is available, lease it out
@@ -112,13 +103,24 @@ type Philo struct {
 	leftCS, rightCS     *ChopS
 }
 
+// create 2 mealticket mutex
+type mealTicket struct {
+	id  int
+	mtx sync.Mutex
+}
+
+type mealGrant struct {
+	philoId      int
+	mealTicketId int
+}
+
 func (p Philo) eat() {
 	for {
 		// check if meal ticket was granted to this philo by host
-		mealGrant <- grantATicketChnl
+		myMealGrant := <-grantATicketChnl
 		//
-		if p.id == mealGrant.philoId {
-			fmt.Println("Meal ticket granted to me. philo" + p.id)
+		if p.id == myMealGrant.philoId {
+			fmt.Printf("Meal ticket %v granted to me. philo%v\n", myMealGrant, p.id)
 			/* p.leftCS.Lock()
 			   p.rightCS.Lock()
 			   fmt.Println("eating")
@@ -126,7 +128,7 @@ func (p Philo) eat() {
 			   p.leftCS.Unlock()
 			    p.mealTix.Lock() */
 		} else {
-			fmt.Println("Meal ticket NOT granted to me. philo" + p.id)
+			fmt.Printf("Meal ticket %v NOT granted to me. philo%v\n", myMealGrant, p.id)
 		}
 	}
 
