@@ -26,6 +26,7 @@ var numPhilosFull int
 var wg sync.WaitGroup
 var maxPhilos int
 var mx sync.Mutex
+var philos []*Philo
 
 func main() {
 
@@ -36,7 +37,7 @@ func main() {
 	}
 	fmt.Printf("Chopsticks instantiated: %v\n", CSticks)
 
-	philos := make([]*Philo, 5)
+	philos = make([]*Philo, 5)
 	numPhilosFull = 0
 	for i := 0; i < 5; i++ {
 		philos[i] = &Philo{i, false, CSticks[i], CSticks[(i+1)%5]}
@@ -131,6 +132,7 @@ func hostLeasesMealTicket(tixId int) {
 			}
 			fmt.Printf("Host: Received meal request from Philosopher%v.\n", requestingPhiloId)
 			// try to grant 1 meal ticket if any avail to requestor
+			// Note: also check here if requesting philoshoper is already full
 			if isMealTixAvail {
 				mg := &mealGrant{requestingPhiloId, tixId}
 				fmt.Printf("Host: Leasing out meal ticket %v to Philosopher%v.\n", tixId, requestingPhiloId)
@@ -147,7 +149,7 @@ func hostLeasesMealTicket(tixId int) {
 			}
 
 		} else {
-			fmt.Printf("Host: All philos are full, terminating serving of leases for meal tickets.\n")
+			fmt.Printf("Host: All philos are full, terminating serving of leases for meal ticket %v.\n", tixId)
 			break
 		} // if all philos
 	} // for loop
@@ -160,9 +162,9 @@ type ChopS struct {
 }
 
 type Philo struct {
-	id                  int
-	isGrantedMealTicket bool
-	leftCS, rightCS     *ChopS
+	id              int
+	isAlreadyFull   bool
+	leftCS, rightCS *ChopS
 }
 
 // create 2 mealticket mutex
@@ -177,7 +179,7 @@ type mealGrant struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 1 // max number of times philosopher can eat before full
+	maxTimesEat := 2 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
@@ -205,6 +207,7 @@ func (p Philo) eat() {
 			}
 		} else {
 			fmt.Printf("Philosopher%v: Done eating max number of times %v.\n", p.id, numTimesEat)
+			p.isAlreadyFull = true
 			break
 		}
 		//	time.Sleep(1 * time.Microsecond) // sleep before requesting new ticket
