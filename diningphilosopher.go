@@ -51,11 +51,10 @@ func main() {
 
 	go hostProcessMealTickets()
 
-	/*
-	   for i:0;i<5; i++ {
-	    go philos[i].eat()
-	   }
-	*/
+	for i := 0; i < 5; i++ {
+		go philos[i].eat()
+	}
+
 	time.Sleep(time.Millisecond)
 	fmt.Println("Done with func main().")
 }
@@ -122,8 +121,12 @@ type mealGrant struct {
 
 func (p Philo) eat() {
 	for numTimesEat := 0; numTimesEat < 3; numTimesEat++ {
+		//send request to eat to host via channel
+		fmt.Printf("Philosopher%v: Sending request to host for meal ticket\n", p.id)
+		requestForTicketChnl <- p.id
+
 		// check if meal ticket was granted to this philo by host
-		fmt.Printf("Waiting for meal ticket: philo%v\n", p.id)
+		fmt.Printf("Philosopher%v: Waiting for meal ticket\n", p.id)
 		myMealGrant := <-grantATicketChnl
 		//
 		if p.id == myMealGrant.philoId {
