@@ -20,7 +20,9 @@ import (
 )
 
 var requestForTicketChnl chan int
-var grantATicketChnl chan mealGrant
+var grantATicketChnl chan *mealGrant
+var mealTickets []*mealTicket
+var isMealTix1Avail, isMealTix2Avail bool
 
 func main() {
 
@@ -37,17 +39,18 @@ func main() {
 	}
 	fmt.Printf("Philosophers instantiated: %v\n", philos)
 
-	/*mealTickets := make([]*mealTicket, 2)
+	mealTickets = make([]*mealTicket, 2)
 	for i := 0; i < 2; i++ {
-		mealTickets[i] = &mealTicket{i, new(sync.Mutex)}
+		//mealTickets[i] = &mealTicket{i, new(sync.Mutex)}
+		mealTickets[i] = &mealTicket{i}
 	}
-	fmt.Printf("Meal tickets instantiated: %v", mealTickets)*/
+	fmt.Printf("Meal tickets instantiated: %v\n", mealTickets)
 
-	/*isMealTix1Avail := true
-	isMealTix2AVail := true*/
+	isMealTix1Avail = true
+	isMealTix2Avail = true
 
-	requestForTicketChnl = make(chan int)   // philo sends their id to host
-	grantATicketChnl = make(chan mealGrant) // host provides mealticket here
+	requestForTicketChnl = make(chan int)    // philo sends their id to host
+	grantATicketChnl = make(chan *mealGrant) // host provides mealticket here
 
 	go hostProcessMealTickets()
 
@@ -55,13 +58,13 @@ func main() {
 		go philos[i].eat()
 	}
 
-	time.Sleep(time.Millisecond)
+	time.Sleep(2 * time.Millisecond)
 	fmt.Println("Done with func main().")
 }
 
 // investigate use of channel between host/server and clients/philos
 func hostProcessMealTickets() {
-	fmt.Println("Host now processing meal tickets.")
+	fmt.Println("Table host now serving meal tickets.")
 	hostGrantsMealTicket()
 	//hostGetsBackMealTicket()
 }
@@ -75,20 +78,20 @@ func hostGrantsMealTicket() {
 	var requestingPhiloId int
 	requestingPhiloId = <-requestForTicketChnl
 	fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
-	/* try to grant ticket if avail to requestor
-	for _,mealTicket := range mealTickets {
-	  if isMealTix1Avail {   // if mealTix1 is available, lease it out
-	    grantATicketChnl <- mealTickets[0]
-	    fmt.Println("Host: Leasing out meal ticket 1.")
-	    isMealTix1Avail = false
-	    return mealTickets[0]
-	  } else isMealTix2Avail {   // else if mealTix2 is availalbe, lease it
-	    grantATicketChnl <- mealTickets[0]
-	    fmt.Println("Host: Leasing out meal ticket 2.")
-	    isMealTix1Avail = false
-	    return mealTickets[1]
-	  }
-	} */
+	// try to grant 1 meal ticket if any avail to requestor
+	for _, mealTicket := range mealTickets {
+		if isMealTix1Avail { // if mealTix1 is available, lease it out
+			mg := &mealGrant{requestingPhiloId, mealTicket.id}
+			grantATicketChnl <- mg
+			fmt.Printf("Host: Leased out meal ticket 0 to philosopher %v.\n", requestingPhiloId)
+			isMealTix1Avail = false
+		} else if isMealTix2Avail { // else if mealTix2 is availalbe, lease it
+			mg := &mealGrant{requestingPhiloId, mealTicket.id}
+			grantATicketChnl <- mg
+			fmt.Printf("Host: Leased out meal ticket 1 to philosopher %v\n.", requestingPhiloId)
+			isMealTix2Avail = false
+		}
+	}
 }
 
 /*
@@ -110,8 +113,8 @@ type Philo struct {
 
 // create 2 mealticket mutex
 type mealTicket struct {
-	id  int
-	mtx sync.Mutex
+	id int
+	//mtx sync.Mutex
 }
 
 type mealGrant struct {
@@ -122,15 +125,15 @@ type mealGrant struct {
 func (p Philo) eat() {
 	for numTimesEat := 0; numTimesEat < 3; numTimesEat++ {
 		//send request to eat to host via channel
-		fmt.Printf("Philosopher%v: Sending request to host for meal ticket\n", p.id)
 		requestForTicketChnl <- p.id
+		fmt.Printf("Philosopher%v: Sent request to host for meal ticket\n", p.id)
 
 		// check if meal ticket was granted to this philo by host
 		fmt.Printf("Philosopher%v: Waiting for meal ticket\n", p.id)
 		myMealGrant := <-grantATicketChnl
 		//
 		if p.id == myMealGrant.philoId {
-			fmt.Printf("Meal ticket %v granted to me. philo%v\n", myMealGrant, p.id)
+			fmt.Printf("Philosopher%v: Received meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
 			/* p.leftCS.Lock()
 			   p.rightCS.Lock()
 			   fmt.Println("eating")
@@ -138,7 +141,7 @@ func (p Philo) eat() {
 			   p.leftCS.Unlock()
 			    p.mealTix.Lock() */
 		} else {
-			fmt.Printf("Meal ticket %v NOT granted to me. philo%v\n", myMealGrant, p.id)
+			fmt.Printf("Philosopher%v: Meal ticket %v is not meant for me.\n", p.id, myMealGrant.mealTicketId)
 		}
 	}
 
