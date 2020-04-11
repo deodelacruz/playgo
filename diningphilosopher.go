@@ -67,8 +67,8 @@ func main() {
 // investigate use of channel between host/server and clients/philos
 func hostProcessMealTickets() {
 	fmt.Println("Table host now serving meal tickets.")
-	hostGrantsMealTicket()
-	//hostGetsBackMealTicket()
+	go hostGrantsMealTicket()
+	go hostGetsBackMealTicket()
 }
 
 // investigate use of channel between host/server and clients/philos
@@ -78,18 +78,18 @@ func hostGrantsMealTicket() {
 	fmt.Println("Host now trying to grant meal tickets.")
 	// monitor channel of requests for meal ticket from philo
 	var requestingPhiloId int
-	requestingPhiloId = <-requestForTicketChnl
-	fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
-	// try to grant 1 meal ticket if any avail to requestor
-	for _, mealTicket := range mealTickets {
+	for {
+		requestingPhiloId = <-requestForTicketChnl
+		fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
+		// try to grant 1 meal ticket if any avail to requestor
 		if isMealTix0Avail { // if mealTix1 is available, lease it out
-			mg := &mealGrant{requestingPhiloId, mealTicket.id}
+			mg := &mealGrant{requestingPhiloId, 0}
 			fmt.Printf("Host: Leasing out meal ticket 0 to philosopher %v.\n", requestingPhiloId)
 			grantATicketChnl <- mg
 			isMealTix0Avail = false
 			break
 		} else if isMealTix1Avail { // else if mealTix2 is availalbe, lease it
-			mg := &mealGrant{requestingPhiloId, mealTicket.id}
+			mg := &mealGrant{requestingPhiloId, 1}
 			fmt.Printf("Host: Leasing out meal ticket 1 to philosopher %v.\n", requestingPhiloId)
 			grantATicketChnl <- mg
 			isMealTix1Avail = false
@@ -100,6 +100,7 @@ func hostGrantsMealTicket() {
 
 func hostGetsBackMealTicket() {
 	mealTixid := <-receiveMealTicketBackChnl
+	fmt.Printf("Host: Received back meal ticket %v.\n", mealTixid)
 	// set mealTix to avail
 	if mealTixid == 0 {
 		isMealTix0Avail = true
@@ -148,6 +149,7 @@ func (p Philo) eat() {
 			   p.rightCS.Unlock()
 			   p.leftCS.Unlock()
 			    p.mealTix.Lock() */
+			//time.Sleep(1 * time.Microsecond)
 			fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
 			receiveMealTicketBackChnl <- myMealGrant.mealTicketId
 		} else {
