@@ -9,7 +9,7 @@ var wg sync.WaitGroup
 var stringCh chan string
 
 func main() {
-	maxThreads := 4
+	maxThreads := 5
 	stringCh = make(chan string)
 	// spawn thread that writes to channel
 	go writeToChan()

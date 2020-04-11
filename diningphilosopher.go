@@ -214,9 +214,9 @@ func (p Philo) eat() {
 				// Note: line below can cause deadlock
 				receiveMealTicketBackChnl <- myMealGrant.mealTicketId
 			} else {
-				// philo, immediately return ticket if not meant for you
+				// philo, immediately return ticket  back to grantATicketChnl if not meant for you
 				fmt.Printf("Philosopher%v: Oops, can't eat. Meal ticket %v is not meant for me.\n", p.id, myMealGrant.mealTicketId)
-				receiveMealTicketBackChnl <- myMealGrant.mealTicketId
+				grantATicketChnl <- myMealGrant
 			}
 		} else {
 			fmt.Printf("Philosopher%v: Done eating max number of times %v.\n", p.id, numTimesEat)
