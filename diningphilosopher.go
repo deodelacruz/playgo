@@ -119,16 +119,21 @@ func hostLeasesMealTicket(tixId int) {
 	// monitor channel of requests for meal ticket from philo
 	isMealTixAvail := true
 	var requestingPhiloId int
+	var ok bool
 	for {
 		// if all philosophers have fully eaten, terminate this goroutine
-		fmt.Printf("Host for lease %v sees numPhilosFull: %v\n", tixId, numPhilosFull)
+		//fmt.Printf("Host for lease %v sees numPhilosFull: %v\n", tixId, numPhilosFull)
 		if numPhilosFull < maxPhilos {
-			requestingPhiloId = <-requestForTicketChnl
-			fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
+			requestingPhiloId, ok = <-requestForTicketChnl // read tix requests from channel while open
+			if ok == false {
+				fmt.Printf("Request for meal tickets channel was closed: %v\n", requestForTicketChnl)
+				break
+			}
+			fmt.Printf("Host: Received meal request from Philosopher%v.\n", requestingPhiloId)
 			// try to grant 1 meal ticket if any avail to requestor
 			if isMealTixAvail {
 				mg := &mealGrant{requestingPhiloId, tixId}
-				fmt.Printf("Host: Leasing out meal ticket %v to philosopher %v.\n", tixId, requestingPhiloId)
+				fmt.Printf("Host: Leasing out meal ticket %v to Philosopher%v.\n", tixId, requestingPhiloId)
 				grantATicketChnl <- mg
 				isMealTixAvail = false
 				//wait for mealticket to be returned
@@ -138,10 +143,11 @@ func hostLeasesMealTicket(tixId int) {
 					fmt.Printf("Host: Received back meal ticket %v.\n", mealTixid)
 				}
 			} else {
-				fmt.Printf("Host: Sorry,philosopher %v. Meal ticket %v is not available.\n", requestingPhiloId, tixId)
+				fmt.Printf("Host: Sorry, Philosopher%v. Meal ticket %v is not available.\n", requestingPhiloId, tixId)
 			}
+
 		} else {
-			fmt.Printf("Host: All philos are full, terminating serving of leases for meal ticket %v.\n", tixId)
+			fmt.Printf("Host: All philos are full, terminating serving of leases for meal tickets.\n")
 			break
 		} // if all philos
 	} // for loop
@@ -206,6 +212,10 @@ func (p Philo) eat() {
 	mx.Lock()
 	numPhilosFull++
 	mx.Unlock()
-	fmt.Printf("Philosopher%v: sees numPhilosFull:%v\n", p.id, numPhilosFull)
+	//fmt.Printf("Philosopher%v: sees numPhilosFull:%v\n", p.id, numPhilosFull)
+	if numPhilosFull == maxPhilos {
+		fmt.Printf("Philosopher%v: Closing tix request channel as all philosophers are full: %v\n", p.id, numPhilosFull)
+		close(requestForTicketChnl) // close tix request channel when all philos are full
+	}
 	wg.Done()
 }
