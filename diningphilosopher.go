@@ -52,9 +52,9 @@ func main() {
 	}
 	fmt.Printf("Meal tickets instantiated: %v\n", mealTickets)
 
-	requestForTicketChnl = make(chan int, 5)      // philo sends their id to host to request meal ticket
-	grantATicketChnl = make(chan *mealGrant, 5)   // host provides mealticket here
-	receiveMealTicketBackChnl = make(chan int, 5) // philo sends back meal ticket here when done eating
+	requestForTicketChnl = make(chan int)      // philo sends their id to host to request meal ticket
+	grantATicketChnl = make(chan *mealGrant)   // host provides mealticket here
+	receiveMealTicketBackChnl = make(chan int) // philo sends back meal ticket here when done eating
 
 	fmt.Println("Table host now serving meal tickets.")
 	for i := 0; i < 2; i++ { //spawn threads to lease 2 meal tickets
@@ -63,7 +63,7 @@ func main() {
 	}
 
 	// spawn threads for x number of philosophers
-	maxPhilos = 3
+	maxPhilos = 2
 	for i := 0; i < maxPhilos; i++ {
 		wg.Add(1)
 		go philos[i].eat()
@@ -186,7 +186,7 @@ type mealGrant struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 3 // max number of times philosopher can eat before full
+	maxTimesEat := 2 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
