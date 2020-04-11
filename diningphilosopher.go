@@ -195,9 +195,10 @@ func (p Philo) eat() {
 			}
 		} else {
 			fmt.Printf("Philosopher%v: Done eating max number of times %v.\n", p.id, numTimesEat)
-			numPhilosFull++
-			wg.Done()
+			break
 		}
 		//	time.Sleep(1 * time.Microsecond) // sleep before requesting new ticket
 	} //for
+	numPhilosFull++
+	wg.Done()
 }
