@@ -186,7 +186,7 @@ type mealGrant struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 2 // max number of times philosopher can eat before full
+	maxTimesEat := 1 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
