@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 var requestForTicketChnl chan int
@@ -150,8 +151,9 @@ func (p Philo) eat() {
 			   p.rightCS.Unlock()
 			   p.leftCS.Unlock()
 			    p.mealTix.Lock() */
-			//time.Sleep(1 * time.Microsecond)
+			time.Sleep(1 * time.Microsecond)
 			fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
+			// Note: line below causes deadlock
 			receiveMealTicketBackChnl <- myMealGrant.mealTicketId
 		} else {
 			fmt.Printf("Philosopher%v: Meal ticket %v is not meant for me.\n", p.id, myMealGrant.mealTicketId)
