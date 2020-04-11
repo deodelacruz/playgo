@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 var requestForTicketChnl chan int
@@ -28,13 +29,13 @@ func main() {
 	for i := 0; i < 5; i++ {
 		CSticks[i] = new(ChopS)
 	}
-	fmt.Printf("Philosophers instantiated: %v", CSticks)
+	fmt.Printf("Chopsticks instantiated: %v\n", CSticks)
 
 	philos := make([]*Philo, 5)
 	for i := 0; i < 5; i++ {
 		philos[i] = &Philo{i, false, CSticks[i], CSticks[(i+1)%5]}
 	}
-	fmt.Printf("Philosophers instantiated: %v", philos)
+	fmt.Printf("Philosophers instantiated: %v\n", philos)
 
 	/*mealTickets := make([]*mealTicket, 2)
 	for i := 0; i < 2; i++ {
@@ -42,22 +43,26 @@ func main() {
 	}
 	fmt.Printf("Meal tickets instantiated: %v", mealTickets)*/
 
-	isMealTix1Avail := true
-	isMealTix2AVail := true
+	/*isMealTix1Avail := true
+	isMealTix2AVail := true*/
 
-	requestForTicketChnl := make(chan int)   // philo sends their id to host
-	grantATicketChnl := make(chan mealGrant) // host provides mealticket here
+	requestForTicketChnl = make(chan int)   // philo sends their id to host
+	grantATicketChnl = make(chan mealGrant) // host provides mealticket here
+
+	go hostProcessMealTickets()
 
 	/*
-	   hostProcessMealTickets()
 	   for i:0;i<5; i++ {
 	    go philos[i].eat()
 	   }
 	*/
+	time.Sleep(time.Millisecond)
+	fmt.Println("Done with func main().")
 }
 
 // investigate use of channel between host/server and clients/philos
 func hostProcessMealTickets() {
+	fmt.Println("Host now processing meal tickets.")
 	hostGrantsMealTicket()
 	//hostGetsBackMealTicket()
 }
@@ -66,6 +71,7 @@ func hostProcessMealTickets() {
 
 // host lets only 2 philos eat at a time
 func hostGrantsMealTicket() {
+	fmt.Println("Host now trying to grant meal tickets.")
 	// monitor channel of requests for meal ticket from philo
 	var requestingPhiloId int
 	requestingPhiloId = <-requestForTicketChnl
@@ -115,8 +121,9 @@ type mealGrant struct {
 }
 
 func (p Philo) eat() {
-	for {
+	for numTimesEat := 0; numTimesEat < 3; numTimesEat++ {
 		// check if meal ticket was granted to this philo by host
+		fmt.Printf("Waiting for meal ticket: philo%v\n", p.id)
 		myMealGrant := <-grantATicketChnl
 		//
 		if p.id == myMealGrant.philoId {
