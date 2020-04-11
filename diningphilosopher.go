@@ -25,6 +25,7 @@ var receiveMealTicketBackChnl chan int
 var mealTickets []*mealTicket
 var numPhilosFull int
 var wg sync.WaitGroup
+var maxPhilos int
 
 func main() {
 
@@ -59,7 +60,9 @@ func main() {
 		go hostLeasesMealTicket(i)
 	}
 
-	for i := 0; i < 5; i++ {
+	// spawn threads for x number of philosophers
+	maxPhilos = 2
+	for i := 0; i < maxPhilos; i++ {
 		wg.Add(1)
 		go philos[i].eat()
 	}
@@ -118,7 +121,8 @@ func hostLeasesMealTicket(tixId int) {
 	var requestingPhiloId int
 	for {
 		// if all philosophers have fully eaten, terminate this goroutine
-		if numPhilosFull < 5 {
+		fmt.Printf("Host for lease %v sees numPhilosFull: %v\n", tixId, numPhilosFull)
+		if numPhilosFull < maxPhilos {
 			requestingPhiloId = <-requestForTicketChnl
 			fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
 			// try to grant 1 meal ticket if any avail to requestor
@@ -175,7 +179,7 @@ func (p Philo) eat() {
 			requestForTicketChnl <- p.id
 			fmt.Printf("Philosopher%v: Sent request to host for meal ticket\n", p.id)
 			// check if meal ticket was granted to this philo by host
-			fmt.Printf("Philosopher%v: Waiting for meal ticket\n", p.id)
+			//fmt.Printf("Philosopher%v: Waiting for meal ticket\n", p.id)
 			myMealGrant := <-grantATicketChnl
 			if p.id == myMealGrant.philoId {
 				fmt.Printf("Philosopher%v: Received meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
@@ -200,5 +204,6 @@ func (p Philo) eat() {
 		//	time.Sleep(1 * time.Microsecond) // sleep before requesting new ticket
 	} //for
 	numPhilosFull++
+	fmt.Printf("Philosopher%v: sees numPhilosFull:%v\n", p.id, numPhilosFull)
 	wg.Done()
 }
