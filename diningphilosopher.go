@@ -23,7 +23,9 @@ var requestForTicketChnl chan int
 var grantATicketChnl chan *mealGrant
 var receiveMealTicketBackChnl chan int
 var mealTickets []*mealTicket
-var isMealTix0Avail, isMealTix1Avail bool
+
+//var isMealTix0Avail bool
+var isMealTix1Avail bool
 
 func main() {
 
@@ -47,7 +49,6 @@ func main() {
 	}
 	fmt.Printf("Meal tickets instantiated: %v\n", mealTickets)
 
-	isMealTix0Avail = true
 	isMealTix1Avail = true
 
 	requestForTicketChnl = make(chan int)      // philo sends their id to host to request meal ticket
@@ -69,13 +70,14 @@ func main() {
 // investigate use of channel between host/server and clients/philos
 func hostProcessMealTickets() {
 	fmt.Println("Table host now serving meal tickets.")
-	go hostGrantsMealTicket()
-	go hostGetsBackMealTicket()
+	hostLeasesMealTicket1()
+	/* go hostGrantsMealTicket()
+	go hostGetsBackMealTicket() */
 }
 
 // investigate use of channel between host/server and clients/philos
 
-// host lets only 2 philos eat at a time
+/* host lets only 2 philos eat at a time
 func hostGrantsMealTicket() {
 	fmt.Println("Host now trying to grant meal tickets.")
 	// monitor channel of requests for meal ticket from philo
@@ -108,6 +110,33 @@ func hostGetsBackMealTicket() {
 		isMealTix0Avail = true
 	} else if mealTixid == 1 {
 		isMealTix1Avail = true
+	}
+}
+*/
+
+func hostLeasesMealTicket1() {
+	fmt.Println("Host now trying to grant meal ticket 0.")
+	// monitor channel of requests for meal ticket from philo
+	isMealTix0Avail := true
+	var requestingPhiloId int
+	for {
+		requestingPhiloId = <-requestForTicketChnl
+		fmt.Printf("Host: Received meal request from philosopher %v.\n", requestingPhiloId)
+		// try to grant 1 meal ticket if any avail to requestor
+		if isMealTix0Avail {
+			mg := &mealGrant{requestingPhiloId, 0}
+			fmt.Printf("Host: Leasing out meal ticket 0 to philosopher %v.\n", requestingPhiloId)
+			grantATicketChnl <- mg
+			isMealTix0Avail = false
+			//wait for mealticket to be returned
+			mealTixid := <-receiveMealTicketBackChnl
+			if mealTixid == 0 {
+				isMealTix0Avail = true
+				fmt.Printf("Host: Received back meal ticket %v.\n", mealTixid)
+			}
+		} else {
+			fmt.Printf("Host: Sorry,philosopher %v. Meal ticket 0 is not available.\n", requestingPhiloId)
+		}
 	}
 }
 
