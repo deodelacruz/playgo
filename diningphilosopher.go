@@ -16,7 +16,6 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
 var requestForTicketChnl chan int
@@ -56,11 +55,13 @@ func main() {
 
 	go hostProcessMealTickets()
 
+	var wg sync.WaitGroup
+	wg.Add(5)
 	for i := 0; i < 5; i++ {
 		go philos[i].eat()
 	}
-
-	time.Sleep(5 * time.Millisecond)
+	wg.Wait()
+	//time.Sleep(5 * time.Millisecond)
 	fmt.Println("Done with func main().")
 }
 
