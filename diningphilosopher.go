@@ -62,7 +62,7 @@ func main() {
 	}
 
 	// spawn threads for x number of philosophers
-	maxPhilos = 2
+	maxPhilos = 3
 	for i := 0; i < maxPhilos; i++ {
 		wg.Add(1)
 		go philos[i].eat()
@@ -133,7 +133,7 @@ func hostLeasesMealTicket(tixId int) {
 			fmt.Printf("Host: Received meal request from Philosopher%v.\n", requestingPhiloId)
 			// try to grant 1 meal ticket if any avail to requestor
 			// Note: also check here if requesting philoshoper is already full
-			if isMealTixAvail {
+			if isMealTixAvail && !philos[requestingPhiloId].isAlreadyFull {
 				mg := &mealGrant{requestingPhiloId, tixId}
 				fmt.Printf("Host: Leasing out meal ticket %v to Philosopher%v.\n", tixId, requestingPhiloId)
 				grantATicketChnl <- mg
@@ -179,7 +179,7 @@ type mealGrant struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 2 // max number of times philosopher can eat before full
+	maxTimesEat := 1 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
@@ -200,10 +200,12 @@ func (p Philo) eat() {
 				//time.Sleep(1 * time.Microsecond)
 				numTimesEat++
 				fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v.\n", p.id, myMealGrant.mealTicketId)
-				// Note: line below causes deadlock
+				// Note: line below can cause deadlock
 				receiveMealTicketBackChnl <- myMealGrant.mealTicketId
 			} else {
+				// philo, immediately return ticket if not meant for you
 				fmt.Printf("Philosopher%v: Meal ticket %v is not meant for me.\n", p.id, myMealGrant.mealTicketId)
+				receiveMealTicketBackChnl <- myMealGrant.mealTicketId
 			}
 		} else {
 			fmt.Printf("Philosopher%v: Done eating max number of times %v.\n", p.id, numTimesEat)
