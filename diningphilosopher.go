@@ -16,8 +16,17 @@ import ("fmt")
 
 func main() {
 
-requestForTicketChnl := make(chan int) // philo sends their id to host
-grantATicketChnl := make(chan mealGrant) // host provides mealticket here
+    requestForTicketChnl := make(chan int) // philo sends their id to host
+    grantATicketChnl := make(chan mealGrant) // host provides mealticket here
+    philos := make([]*Philo, 5)
+    for i:=0;i<5; i++ {
+       philos[i] = &Philo{i,false,CSticks[i],CSticks[(i+1)%5]}
+    }
+    fmt.Printf("Philosophers instantiated: %v", philos)
+    hostProcessMealTickets()
+    for i:0;i<5; i++ {
+     go philos[i].eat()
+    }
 
 }
 
@@ -43,19 +52,18 @@ isMealTix2AVail := true
 // investigate use of channel between host/server and clients/philos
 func hostProcessMealTickets() {
   hostGrantsMealTicket()
-  hostGetsBackMealTicket()
+  //hostGetsBackMealTicket()
 }
 
 // investigate use of channel between host/server and clients/philos
 
 // host lets only 2 philos eat at a time
-func hostGrantsMealTicket() *sync.Mutex {
-
-  // monitor requestForTicketChnl channel
-  // request for meal ticket received from philo
+func hostGrantsMealTicket() {
+  // monitor channel of requests for meal ticket from philo
   philoId <-requestForTicketChnl
   requestingPhiloId := requestForTicketChnl
-  // try to grant ticket if avail to requestor
+  fmt.Println("Host: Received meal request from philosopher." + philoId)
+  /* try to grant ticket if avail to requestor
   for _,mealTicket := range mealTickets {
     if isMealTix1Avail {   // if mealTix1 is available, lease it out
       grantATicketChnl <- mealTickets[0]
@@ -68,17 +76,14 @@ func hostGrantsMealTicket() *sync.Mutex {
       isMealTix1Avail = false
       return mealTickets[1]
     }
-  }
+  } */
 }
 
+/*
 func hostGetsBackMealTicket(mealTix *sync.Mutext)  {
   // set mealTix to avail
   mealTix.Lock()
-
-
-}
-
-
+} */
 
 // create 5 chopstick mutex
 type ChopS struct {sync.Mutex}
@@ -87,12 +92,10 @@ for i:=0;i<5; i++ {
   CSticks[i] = new(ChopS)
 }
 
-
-
 type Philo struct {
   id int
- leftCS, rightCS *ChopsS
- mealTix *mealTicket
+  isGrantedMealTicket bool
+  leftCS, rightCS *ChopsS
 }
 
 func (p Philo) eat() {
@@ -102,24 +105,17 @@ func (p Philo) eat() {
    //
    if p.id == mealGrant.philoId {
      fmt.Println("Meal ticket granted. ")
-     p.leftCS.Lock()
+     /* p.leftCS.Lock()
      p.rightCS.Lock()
      fmt.Println("eating")
      p.rightCS.Unlock()
      p.leftCS.Unlock()
-      p.mealTix.Lock()
+      p.mealTix.Lock() */
     } else {
            fmt.Println("Meal ticket NOT granted to me. philo" + p.id)
     }
 }
 
-philos := make([]*Philo, 5)
-for i:=0;i<5; i++ {
-   philos[i] = &Philo{CSticks[i],CSticks[(i+1)%5]}
-}
 
-for i:0;i<5; i++ {
- go philos[i].eat()
-}
 
 }
