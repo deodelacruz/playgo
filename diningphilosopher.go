@@ -22,7 +22,6 @@ import (
 var requestForTicketChnl chan int
 var numPhilosFull int
 var wg sync.WaitGroup
-
 var maxPhilos int
 var mx sync.Mutex
 var philos []*Philo
@@ -36,7 +35,7 @@ func main() {
 	}
 	//fmt.Printf("Chopsticks instantiated: %v\n", CSticks)
 
-	maxPhilos = 1
+	maxPhilos = 3
 	philos = make([]*Philo, maxPhilos)
 	numPhilosFull = 0
 	for i := 0; i < maxPhilos; i++ {
@@ -47,7 +46,7 @@ func main() {
 	requestForTicketChnl = make(chan int, 1) // philo sends their id to host to request meal ticket
 
 	//fmt.Println("Table host now serving meal tickets.")
-	maxMealTickets := 1
+	maxMealTickets := 2
 	for i := 0; i < maxMealTickets; i++ { //spawn threads to lease 2 meal tickets
 		wg.Add(1)
 		go hostLeasesMealTicket(i)
@@ -76,21 +75,14 @@ func hostLeasesMealTicket(tixId int) {
 		if numPhilosFull < maxPhilos {
 			requestingPhiloId, ok = <-requestForTicketChnl // read tix requests from channel while open
 			if ok == false {
-				fmt.Printf("Request for meal tickets channel was closed: %v\n", requestForTicketChnl)
+				fmt.Printf("Host%v: Request for meal tickets channel was already closed: %v\n", tixId, requestForTicketChnl)
 				break
 			}
 			fmt.Printf("Host%v: Received meal request from Philosopher%v.\n", tixId, requestingPhiloId)
 			// try to grant 1 meal ticket if any avail to requestor
 			// Note: also check here if requesting philoshoper is already full
 			if isMealTixAvail && !philos[requestingPhiloId].isAlreadyFull {
-
 				fmt.Printf("Host%v: Leasing out meal ticket %v to Philosopher%v.\n", tixId, tixId, requestingPhiloId)
-
-				// getting channel mismatch between host and receiver here
-				/*tmpCh := make(chan int, 1)
-				philos[requestingPhiloId].hostCommsCh = tmpCh
-				tmpCh <- tixId */
-
 				philos[requestingPhiloId].hostCommsCh <- tixId
 				fmt.Printf("Host%v: Successfully sent out meal ticket %v via channel %v to Philosopher%v.\n", tixId, tixId, philos[requestingPhiloId].hostCommsCh, requestingPhiloId)
 				isMealTixAvail = false
@@ -105,8 +97,6 @@ func hostLeasesMealTicket(tixId int) {
 					isMealTixAvail = true
 					fmt.Printf("Host%v: Received back meal ticket %v.\n", tixId, mealTixid)
 				}
-				//philos[requestingPhiloId].hostCommsCh = nil
-				//close(tmpCh)
 			} else {
 				fmt.Printf("Host%v: Sorry, Philosopher%v. Meal ticket %v is not available.\n", tixId, requestingPhiloId, tixId)
 			}
@@ -132,25 +122,21 @@ type Philo struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 1 // max number of times philosopher can eat before full
+	maxTimesEat := 2 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
-
-			//Note: also try implementing below as host function that returns a dedicaed channel
-			//send request to eat to host via channel
+			//send request to eat to host via common channel
 			requestForTicketChnl <- p.id
 			fmt.Printf("Philosopher%v: Sent request to host for meal ticket.\n", p.id)
 
-			// when does the hostCommsCh get actually switched?
 			// check if meal ticket was granted to this philo by host
 			fmt.Printf("Philosopher%v: Waiting for meal ticket on channel %v...\n", p.id, p.hostCommsCh)
-			grantedMealTixId, ok := <-p.hostCommsCh //try to use a new dedicated channel to host here
+			grantedMealTixId, ok := <-p.hostCommsCh //dedicated channel to host here
 			if ok == false {
 				fmt.Printf("Grant meal tickets channel was closed: %v\n", p.hostCommsCh)
 				break //hmm, check this
 			}
-			// hmm, not able to get to this point, why?
 			fmt.Printf("Philosopher%v: Received meal ticket %v.\n", p.id, grantedMealTixId)
 			/* p.leftCS.Lock()
 			   p.rightCS.Lock()
@@ -160,22 +146,22 @@ func (p Philo) eat() {
 			    p.mealTix.Lock() */
 			time.Sleep(1 * time.Microsecond)
 			numTimesEat++
-			fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v.\n", p.id, grantedMealTixId)
-			// Note: line below can cause deadlock
+			fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v on channel %v....\n", p.id, grantedMealTixId, p.hostCommsCh)
 			p.hostCommsCh <- grantedMealTixId
+			fmt.Printf("Philosopher%v: Successfully sent back meal ticket %v on channel %v....\n", p.id, grantedMealTixId, p.hostCommsCh)
 		} else {
 			fmt.Printf("Philosopher%v: Done eating max number of times %v.\n", p.id, numTimesEat)
 			p.isAlreadyFull = true
 			break
 		}
-		//	time.Sleep(1 * time.Microsecond) // sleep before requesting new ticket
+		time.Sleep(1 * time.Microsecond) // sleep a bit before requesting new ticket again
 	} //for
 	mx.Lock()
 	numPhilosFull++
 	mx.Unlock()
 	//fmt.Printf("Philosopher%v: sees numPhilosFull:%v\n", p.id, numPhilosFull)
 	if numPhilosFull == maxPhilos {
-		fmt.Printf("Philosopher%v: Closing tix request channel as all philosophers are full: %v\n", p.id, numPhilosFull)
+		fmt.Printf("Philosopher%v: Closing tix request channel as all philosophers are now full: %v\n", p.id, numPhilosFull)
 		close(requestForTicketChnl) // close tixRequest channel when all philos are full
 	}
 	wg.Done()
