@@ -140,7 +140,7 @@ func (p Philo) eat() {
 			p.leftCS.Lock()
 			p.rightCS.Lock()
 			fmt.Printf("starting to eat %v\n", p.id+1)
-			time.Sleep(1 * time.Microsecond)
+			time.Sleep(1 * time.Millisecond)
 			fmt.Printf("finishing eating %v\n", p.id+1)
 			p.rightCS.Unlock()
 			p.leftCS.Unlock()
