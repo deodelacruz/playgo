@@ -35,7 +35,7 @@ func main() {
 	}
 	//fmt.Printf("Chopsticks instantiated: %v\n", CSticks)
 
-	maxPhilos = 3
+	maxPhilos = 5
 	philos = make([]*Philo, maxPhilos)
 	numPhilosFull = 0
 	for i := 0; i < maxPhilos; i++ {
@@ -122,7 +122,7 @@ type Philo struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 2 // max number of times philosopher can eat before full
+	maxTimesEat := 3 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
