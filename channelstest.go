@@ -16,7 +16,7 @@ var wg sync.WaitGroup
 var stringCh chan string
 
 func main() {
-	maxReadThreads := 2
+	maxReadThreads := 3
 	maxWriteThreads := 2
 	stringCh = make(chan string, 1)
 

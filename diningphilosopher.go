@@ -131,7 +131,7 @@ func hostLeasesMealTicket(tixId int) {
 				fmt.Printf("Request for meal tickets channel was closed: %v\n", requestForTicketChnl)
 				break
 			}
-			fmt.Printf("Host: Received meal request from Philosopher%v.\n", requestingPhiloId)
+			//fmt.Printf("Host: Received meal request from Philosopher%v.\n", requestingPhiloId)
 			// try to grant 1 meal ticket if any avail to requestor
 			// Note: also check here if requesting philoshoper is already full
 			if isMealTixAvail && !philos[requestingPhiloId].isAlreadyFull {
@@ -186,13 +186,13 @@ type mealGrant struct {
 }
 
 func (p Philo) eat() {
-	maxTimesEat := 1 // max number of times philosopher can eat before full
+	maxTimesEat := 2 // max number of times philosopher can eat before full
 	numTimesEat := 0
 	for {
 		if numTimesEat < maxTimesEat {
 			//send request to eat to host via channel
 			requestForTicketChnl <- p.id
-			fmt.Printf("Philosopher%v: Sent request to host for meal ticket\n", p.id)
+			//fmt.Printf("Philosopher%v: Sent request to host for meal ticket\n", p.id)
 			// check if meal ticket was granted to this philo by host
 			//fmt.Printf("Philosopher%v: Waiting for meal ticket\n", p.id)
 			myMealGrant, ok := <-grantATicketChnl
