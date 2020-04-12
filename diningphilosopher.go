@@ -109,7 +109,6 @@ func hostLeasesMealTicket(tixId int) {
 	wg.Done()
 }
 
-// create 5 chopstick mutex
 type ChopS struct {
 	sync.Mutex
 }
@@ -138,13 +137,13 @@ func (p Philo) eat() {
 				break //hmm, check this
 			}
 			fmt.Printf("Philosopher%v: Received meal ticket %v.\n", p.id, grantedMealTixId)
-			/* p.leftCS.Lock()
-			   p.rightCS.Lock()
-			   fmt.Println("eating")
-			   p.rightCS.Unlock()
-			   p.leftCS.Unlock()
-			    p.mealTix.Lock() */
+			p.leftCS.Lock()
+			p.rightCS.Lock()
+			fmt.Printf("starting to eat %v", p.id+1)
 			time.Sleep(1 * time.Microsecond)
+			fmt.Printf("finishing eating %v", p.id+1)
+			p.rightCS.Unlock()
+			p.leftCS.Unlock()
 			numTimesEat++
 			fmt.Printf("Philosopher%v: Done eating. Returning back meal ticket %v on channel %v....\n", p.id, grantedMealTixId, p.hostCommsCh)
 			p.hostCommsCh <- grantedMealTixId
