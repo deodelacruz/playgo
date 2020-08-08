@@ -1,4 +1,4 @@
-package playgo
+package main
 
 import (
 	"fmt"
