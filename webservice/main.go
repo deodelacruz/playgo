@@ -9,8 +9,8 @@ import (
 func main() {
 	u := models.User{
 		ID:        2,
-		FirstName: "Deo",
-		LastName:  "Dela Cruz",
+		FirstName: "hiho",
+		LastName:  "hohum",
 	}
 	fmt.Println(u)
 	port := 3000
