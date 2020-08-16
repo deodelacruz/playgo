@@ -1,3 +1,8 @@
+Modules - official preferred setup over workspace
+--------------
+go mod init github.com/deodelacruz/playgo
+(creates a go.mod file)
+
 Sync.Mutex (mutual exclusion, only one at a time gets access)
 
 Lock() - sets shared variable in use for 1st thread, other threads will block
