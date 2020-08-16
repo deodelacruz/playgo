@@ -1,3 +1,6 @@
+Beginner Programmer Exercises:
+https://adriann.github.io/programming_problems.html
+
 Modules - official preferred setup over workspace
 --------------
 go mod init github.com/deodelacruz/playgo
